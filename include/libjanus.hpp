@@ -1,5 +1,5 @@
-#ifndef LIBPM_HPP
-#define LIBPM_HPP
+#ifndef LIBJANUS_HPP
+#define LIBJANUS_HPP
 
 #include <gpgme++/context.h>
 

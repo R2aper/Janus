@@ -1,12 +1,12 @@
 #include <iostream>
 #include <string>
 
-#include "libpm.hpp"
+#include "libjanus.hpp"
 
 /*
 TODO:
 
-? What inside .pm
+? What inside .janus
 * Reload cache of keys
 ? Parsing arguments, multiple passwords and etc
 * git track?
@@ -40,7 +40,7 @@ int main(int argc, char *argv[]) {
       i++;
       continue;
     } else if (!isInit()) {
-      std::cerr << "Error: not a vault directory: .pm" << std::endl;
+      std::cerr << "Error: not a vault directory: .janus" << std::endl;
       return 1;
 
     } else if (command == "remove" && argc > i + 1) {

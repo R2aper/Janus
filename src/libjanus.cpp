@@ -11,11 +11,11 @@
 #include <string>
 #include <vector>
 
-#include "libpm.hpp"
+#include "libjanus.hpp"
 
 namespace fs = std::filesystem;
 
-bool isInit() { return fs::exists(".pm"); }
+bool isInit() { return fs::exists(".janus"); }
 
 GpgME::Context *GpgInit() { //! Multiple inizialization?
 
@@ -70,18 +70,18 @@ std::vector<GpgME::Key> GetKeys(const std::string &key_id) { //!!
 }
 
 void Init() {
-  if (fs::exists(".pm")) {
-    std::cerr << "Error: .pm already exist!" << std::endl;
+  if (fs::exists(".janus")) {
+    std::cerr << "Error: .janus already exist!" << std::endl;
     exit(1);
   }
 
-  fs::create_directory(".pm");
-  if (!fs::exists(".pm")) {
-    std::cerr << "Error creating .pm dir!" << std::endl;
+  fs::create_directory(".janus");
+  if (!fs::exists(".janus")) {
+    std::cerr << "Error creating .janus dir!" << std::endl;
     exit(1);
   }
 
-  std::cout << "Initialized Vault in " << fs::absolute(".pm") << std::endl;
+  std::cout << "Initialized Vault in " << fs::absolute(".janus") << std::endl;
 }
 
 void RemovePassword(const std::string &name) {

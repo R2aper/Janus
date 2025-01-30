@@ -3,6 +3,8 @@
 
 #include "libjanus.hpp"
 
+using namespace janus;
+
 /*
 TODO:
 
@@ -11,11 +13,22 @@ TODO:
 ? Parsing arguments, multiple passwords and etc
 * git track?
 * if else -> try catch
-* Write usage
+* Ask before delete password
 
 */
 
-void usage() { std::cout << "[init |add <name> |remove <name> |show <name> ]" << std::endl; }
+void usage() {
+  std::cout << "Usage: janus [Options] <command> \n\
+Options: \n\
+  -h, --help            Show this help message\n\
+  -k <fingerprint>      Enter fingerprint of the key to encrypt the password with(In default passwords encrypted with all available keys)\n\
+Command: \n\
+  init                  Initialize a new vault in the current working directory\n\
+  list                  List all passwords in the vault\n\
+  add <name>            Add a new password to the vault\n\
+  remove <name>         Remove a password from the vault\n\
+  show <name>           Show a password from the vault\n";
+}
 
 int main(int argc, char *argv[]) {
   if (argc < 2) {
@@ -45,6 +58,10 @@ int main(int argc, char *argv[]) {
 
     } else if (command == "remove" && argc > i + 1) {
       RemovePassword(argv[i + 1]);
+      return 0;
+
+    } else if (command == "list") {
+      list();
       return 0;
 
     } else if (command == "add" && argc > i + 1) {

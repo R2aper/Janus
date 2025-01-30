@@ -12,7 +12,7 @@ TODO:
 * Reload cache of keys
 ? Parsing arguments, multiple passwords and etc
 * git track?
-* if else -> try catch
+* Error handling!!
 * Ask before delete password
 
 */

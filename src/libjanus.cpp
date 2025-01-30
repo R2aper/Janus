@@ -16,22 +16,22 @@
 namespace fs = std::filesystem;
 
 namespace janus {
-// Check that library was not initialized before
-bool gpgme_initialized = false;
 
 /// Initialize gpgme library and create GpgME::Context
 /// @return GpgME::Context pointer
+/// @throw Program throw runtime error if GpgME::Context creation fails
 GpgME::Context *GpgInit() {
-  if (!janus::gpgme_initialized) {
+  // Check that library was not initialized before
+  static bool gpgme_initialized = false;
+
+  if (!gpgme_initialized) {
     GpgME::initializeLibrary();
-    janus::gpgme_initialized = true;
+    gpgme_initialized = true;
   }
 
   auto ctx = GpgME::Context::createForProtocol(GpgME::OpenPGP);
-  if (!ctx) {
-    std::cerr << "Error creating GPG context!" << std::endl;
-    exit(1);
-  }
+  if (!ctx)
+    throw std::runtime_error("Error creating GPG context!");
 
   //? Set pinentry mode to ask for password(Doesn't work)
   ctx->setPinentryMode(GpgME::Context::PinentryMode::PinentryAsk);
@@ -49,16 +49,18 @@ GpgME::Context *GpgInit() {
  * @param key_id The identifier of the key to retrieve. If empty, all keys are listed.
  * @return A vector of GpgME::Key objects that can be used for encryption.
  * @throw If no suitable encryption keys are found or if the specified key_id
- *         does not correspond to a valid encryption key.
+ *         does not correspond to a valid encryption key, program throw a runtime error.
  */
 std::vector<GpgME::Key> GetKeys(const std::string &key_id) { //!! Rewrite
   auto ctx = GpgInit();
+  std::vector<GpgME::Key> keys;
+  GpgME::Error err;
+  GpgME::Key key;
 
   if (key_id.empty()) {
-    std::vector<GpgME::Key> keys;
-    GpgME::Error err = ctx->startKeyListing("", false);
+    err = ctx->startKeyListing("", false);
     while (!err) {
-      GpgME::Key key = ctx->nextKey(err);
+      key = ctx->nextKey(err);
       if (key.isNull())
         break;
       if (key.canEncrypt())
@@ -66,49 +68,36 @@ std::vector<GpgME::Key> GetKeys(const std::string &key_id) { //!! Rewrite
     }
     ctx->endKeyListing();
 
-    if (keys.empty()) {
-      std::cerr << "No suitable encryption keys found!" << std::endl;
-      exit(1);
-    }
-    return keys;
+    if (keys.empty())
+      throw std::runtime_error("No suitable encryption keys found!");
+
   } else {
-    GpgME::Error err;
-    GpgME::Key key = ctx->key(key_id.c_str(), err);
+    key = ctx->key(key_id.c_str(), err);
 
-    if (key.isNull()) {
-      std::cerr << "Key not found!" << std::endl;
-      exit(1);
-    }
+    if (key.isNull() || !key.canEncrypt())
+      throw std::runtime_error(
+          "Specified fingerprint does not correspond to a valid encryption key!");
 
-    if (!key.canEncrypt()) {
-      std::cerr << "Key can't encrypt!" << std::endl;
-      exit(1);
-    }
-
-    return {key};
+    keys.push_back(key);
   }
+
+  return keys;
 }
 
 /**
  * Initializes a new vault in the current working directory.
  *
  * @throw If the directory ".janus" already exists in the current working
- * directory or if the creation of the directory fails, an error message is printed to the standard
- error stream and the program exits with a non-zero status code.
- *
+ * directory or if the creation of the directory fails, program thrown a filesystem error.
  */
 void Init() {
-  if (fs::exists(".janus")) {
-    std::cerr << "Error: .janus already exist!" << std::endl;
-    exit(1);
-  }
+  if (fs::exists(".janus"))
+    throw fs::filesystem_error(".janus", std::error_code(EEXIST, std::system_category()));
 
   fs::create_directory(".janus");
 
-  if (!fs::exists(".janus")) {
-    std::cerr << "Error creating .janus dir!" << std::endl;
-    exit(1);
-  }
+  if (!fs::exists(".janus"))
+    throw fs::filesystem_error(".janus", std::error_code(EAGAIN, std::system_category())); //?
 
   std::cout << "Initialized Vault in " << fs::absolute(".janus") << std::endl;
 }
@@ -131,19 +120,15 @@ void list() {
  * Removes a password from the vault.
  *
  * @param name The name of the password to remove.
- * @throw If the file "<name>.gpg" does not exist, an error message is printed to the
- * standard error stream and the program exits with a non-zero status code.
+ * @throw If the file "<name>.gpg" does not exist, program throw a filesystem error.
  */
 void RemovePassword(const std::string &name) {
   fs::path file_path = name + ".gpg";
 
-  if (!fs::exists(file_path)) {
-    std::cerr << "Password not found!" << std::endl;
-    exit(1);
-  }
+  if (!fs::exists(file_path))
+    throw fs::filesystem_error(file_path, std::error_code(ENOENT, std::system_category()));
 
   fs::remove(file_path);
-  std::cout << "Password removed successfully!" << std::endl;
 }
 
 /**
@@ -151,20 +136,17 @@ void RemovePassword(const std::string &name) {
  *
  * @param name The name of the password to add.
  * @param key The keys to encrypt the password with.
- * @throw If the file "<name>.gpg" already exists, an error message is printed to the
- * standard error stream and the program exits with a non-zero status code.
- * @throw If encryption fails, an error message is printed to the standard error stream and the
- * program exits with a non-zero status code.
+ * @throw If the file "<name>.gpg" already exists, program throw a filesystem error
+ * @throw If the file is not open, program throw a runtime error
+ * @throw If encryption fails, program throw a runtime error
  */
 void AddPassword(const std::string &name, const std::vector<GpgME::Key> &keys) {
   std::string content;
   std::vector<std::string> input;
   fs::path file_path = name + ".gpg";
 
-  if (fs::exists(file_path)) {
-    std::cerr << "Password already exists!" << std::endl;
-    exit(1);
-  }
+  if (fs::exists(file_path))
+    throw fs::filesystem_error(file_path, std::error_code(EEXIST, std::system_category()));
 
   std::cout << "Enter password content:" << std::endl;
 
@@ -185,12 +167,14 @@ void AddPassword(const std::string &name, const std::vector<GpgME::Key> &keys) {
   GpgME::Data cipherData;
   GpgME::EncryptionResult result =
       ctx->encrypt(keys, plainData, cipherData, GpgME::Context::EncryptionFlags::AlwaysTrust);
-  if (result.error()) {
-    std::cerr << "Encryption failed: " << result.error().asString() << std::endl;
-    exit(1);
-  }
 
-  std::ofstream file(file_path, std::ios::binary);
+  if (result.error())
+    throw std::runtime_error(result.error().asString());
+
+  std::ofstream file(file_path, std::ios::binary); //!
+
+  if (!file.is_open())
+    throw std::runtime_error("Error opening file!"); //!!
 
   std::string cipherText = cipherData.toString();
   file.write(cipherText.c_str(), cipherText.size()); //!!
@@ -201,20 +185,21 @@ void AddPassword(const std::string &name, const std::vector<GpgME::Key> &keys) {
  * Shows a password from the vault.
  *
  * @param name The name of the password to show.
- * @throw If the file "<name>.gpg" does not exist, an error message is printed to the
- * standard error stream and the program exits with a non-zero status code.
- * @throw If decryption fails, an error message is printed to the standard error stream and the
- * program exits with a non-zero status code.
+ * @throw If the file "<name>.gpg" does not exist, program throw a filesystem error.
+ * @throw If the file is not open, program throw a runtime error.
+ * @throw If decryption fails, program throw a runtime error.
  */
 void ShowPassword(const std::string &name) {
   fs::path file_path = name + ".gpg";
 
-  if (!fs::exists(file_path)) {
-    std::cerr << "Password not found!" << std::endl;
-    exit(1);
-  }
+  if (!fs::exists(file_path))
+    throw fs::filesystem_error(file_path, std::error_code(ENOENT, std::system_category()));
 
-  std::ifstream file(file_path, std::ios::binary);
+  std::ifstream file(file_path, std::ios::binary); //!
+
+  if (!file.is_open()) //!!
+    throw std::runtime_error("Error opening file!");
+
   std::string cipherText((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
 
   file.close();
@@ -224,10 +209,8 @@ void ShowPassword(const std::string &name) {
   GpgME::Data cipherData(cipherText.c_str(), cipherText.size());
   GpgME::Data plainData;
   GpgME::DecryptionResult result = ctx->decrypt(cipherData, plainData);
-  if (result.error()) {
-    std::cerr << "Decryption failed: " << result.error().asString() << std::endl;
-    exit(1);
-  }
+  if (result.error()) //!!
+    throw std::runtime_error(result.error().asString());
 
   std::cout << plainData.toString();
 }

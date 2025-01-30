@@ -15,42 +15,111 @@
 
 namespace fs = std::filesystem;
 
-void addPassword() {
-  std::string name, content;
-  std::cout << "Enter name:" << std::endl;
-  std::getline(std::cin, name);
-  fs::path file_path = name + ".gpg";
+bool isInit() { return fs::exists(".pm"); }
 
-  if (fs::exists(file_path)) {
-    std::cerr << "Entry already exists!" << std::endl;
-    return;
-  }
-
-  std::cout << "Enter password content:" << std::endl;
-  std::getline(std::cin, content);
+GpgME::Context *GpgInit() { //! Multiple inizialization?
 
   GpgME::initializeLibrary();
   auto ctx = GpgME::Context::createForProtocol(GpgME::OpenPGP);
   if (!ctx) {
-    std::cerr << "Error creating GPG context" << std::endl;
-    return;
+    std::cerr << "Error creating GPG context!" << std::endl;
+    exit(1);
   }
 
-  std::vector<GpgME::Key> keys;
-  GpgME::Error err = ctx->startKeyListing("", false);
-  while (!err) {
-    GpgME::Key key = ctx->nextKey(err);
-    if (key.isNull())
+  ctx->setPinentryMode(GpgME::Context::PinentryMode::PinentryAsk);
+
+  return ctx;
+}
+
+std::vector<GpgME::Key> GetKeys(const std::string &key_id) { //!!
+  auto ctx = GpgInit();
+
+  if (key_id.empty()) {
+    std::vector<GpgME::Key> keys;
+    GpgME::Error err = ctx->startKeyListing("", false);
+    while (!err) {
+      GpgME::Key key = ctx->nextKey(err);
+      if (key.isNull())
+        break;
+      if (key.canEncrypt())
+        keys.push_back(key);
+    }
+    ctx->endKeyListing();
+
+    if (keys.empty()) {
+      std::cerr << "No suitable encryption keys found!" << std::endl;
+      exit(1);
+    }
+    return keys;
+  } else {
+    GpgME::Error err;
+    GpgME::Key key = ctx->key(key_id.c_str(), err);
+
+    if (key.isNull()) {
+      std::cerr << "Key not found!" << std::endl;
+      exit(1);
+    }
+
+    if (!key.canEncrypt()) {
+      std::cerr << "Key can't encrypt!" << std::endl;
+      exit(1);
+    }
+
+    return {key};
+  }
+}
+
+void Init() {
+  if (fs::exists(".pm")) {
+    std::cerr << "Error: .pm already exist!" << std::endl;
+    exit(1);
+  }
+
+  fs::create_directory(".pm");
+  if (!fs::exists(".pm")) {
+    std::cerr << "Error creating .pm dir!" << std::endl;
+    exit(1);
+  }
+
+  std::cout << "Initialized Vault in " << fs::absolute(".pm") << std::endl;
+}
+
+void RemovePassword(const std::string &name) {
+  fs::path file_path = name + ".gpg";
+
+  if (!fs::exists(file_path)) {
+    std::cerr << "Password not found!" << std::endl;
+    exit(1);
+  }
+
+  fs::remove(file_path);
+  std::cout << "Password removed successfully!" << std::endl;
+}
+
+void AddPassword(const std::string &name, const std::vector<GpgME::Key> &keys) {
+  std::string content;
+  std::vector<std::string> input;
+  fs::path file_path = name + ".gpg";
+
+  if (fs::exists(file_path)) {
+    std::cerr << "Password already exists!" << std::endl;
+    exit(1);
+  }
+
+  std::cout << "Enter password content:" << std::endl;
+
+  while (std::getline(std::cin, content)) {
+    if (content.empty()) {
       break;
-    if (key.canEncrypt())
-      keys.push_back(key);
+    }
+    input.push_back(content);
   }
-  ctx->endKeyListing();
+  content.clear();
+  for (std::string &it : input) {
+    content += it + "\n";
+  }
 
-  if (keys.empty()) {
-    std::cerr << "No suitable encryption keys found" << std::endl;
-    return;
-  }
+  auto ctx = GpgInit();
 
   GpgME::Data plainData(content.c_str(), content.size());
   GpgME::Data cipherData;
@@ -58,7 +127,7 @@ void addPassword() {
       ctx->encrypt(keys, plainData, cipherData, GpgME::Context::EncryptionFlags::AlwaysTrust);
   if (result.error()) {
     std::cerr << "Encryption failed: " << result.error().asString() << std::endl;
-    return;
+    exit(1);
   }
 
   std::ofstream file(file_path, std::ios::binary);
@@ -68,30 +137,12 @@ void addPassword() {
   file.close();
 }
 
-void removePassword() {
-  std::string name;
-  std::cout << "Enter name to remove:" << std::endl;
-  std::getline(std::cin, name);
+void ShowPassword(const std::string &name) {
   fs::path file_path = name + ".gpg";
 
   if (!fs::exists(file_path)) {
-    std::cerr << "Entry not found!" << std::endl;
-    return;
-  }
-
-  fs::remove(file_path);
-  std::cout << "Entry removed successfully!" << std::endl;
-}
-
-void showPassword() {
-  std::string name;
-  std::cout << "Enter name to show:" << std::endl;
-  std::getline(std::cin, name);
-  fs::path file_path = name + ".gpg";
-
-  if (!fs::exists(file_path)) {
-    std::cerr << "Entry not found!" << std::endl;
-    return;
+    std::cerr << "Password not found!" << std::endl;
+    exit(1);
   }
 
   std::ifstream file(file_path, std::ios::binary);
@@ -99,22 +150,15 @@ void showPassword() {
 
   file.close();
 
-  GpgME::initializeLibrary();
-  auto ctx = GpgME::Context::createForProtocol(GpgME::OpenPGP);
-  if (!ctx) {
-    std::cerr << "Error creating GPG context" << std::endl;
-    return;
-  }
-
-  // ctx->setPinentryMode(GpgME::Context::PinentryMode::PinentryLoopback); //!!
+  auto ctx = GpgInit();
 
   GpgME::Data cipherData(cipherText.c_str(), cipherText.size());
   GpgME::Data plainData;
   GpgME::DecryptionResult result = ctx->decrypt(cipherData, plainData);
   if (result.error()) {
     std::cerr << "Decryption failed: " << result.error().asString() << std::endl;
-    return;
+    exit(1);
   }
 
-  std::cout << "Content: " << plainData.toString() << std::endl;
+  std::cout << plainData.toString();
 }

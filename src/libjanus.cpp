@@ -128,7 +128,13 @@ void RemovePassword(const std::string &name) {
   if (!fs::exists(file_path))
     throw fs::filesystem_error(file_path, std::error_code(ENOENT, std::system_category()));
 
-  fs::remove(file_path);
+  std::string input;
+  std::cout << "Do you want to delete " << name << "?[y/n]: ";
+  std::cin >> input;
+  if (input == "y")
+    fs::remove(file_path);
+  else
+    return;
 }
 
 /**

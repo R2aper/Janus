@@ -13,7 +13,6 @@ TODO:
 ? Parsing arguments, multiple passwords and etc
 * git track?
 * Error handling!!
-* Ask before delete password
 
 */
 

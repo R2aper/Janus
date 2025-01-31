@@ -5,14 +5,67 @@
 
 namespace janus {
 
+/// Initialize gpgme library and create GpgME::Context
+/// @return GpgME::Context pointer
+/// @throw Program throw runtime error if GpgME::Context creation fails
 GpgME::Context *GpgInit();
+
+/**
+ * Retrieves a list of GpgME::Key objects based on the provided key_id.
+ *
+ * If key_id is empty, it returns all available keys that can be used for encryption.
+ * If key_id is specified, it retrieves the key associated with the given key_id and
+ * ensures that the key can be used for encryption.
+ *
+ * @param key_id The identifier of the key to retrieve. If empty, all keys are listed.
+ * @return A vector of GpgME::Key objects that can be used for encryption.
+ * @throw If no suitable encryption keys are found or if the specified key_id
+ *         does not correspond to a valid encryption key, program throw a runtime error.
+ */
 std::vector<GpgME::Key> GetKeys(const std::string &key_id);
 
-bool isInit();
+/**
+ * Initializes a new vault in the current working directory.
+ *
+ * @throw If the directory ".janus" already exists in the current working
+ * directory or if the creation of the directory fails, program thrown a filesystem error.
+ */
 void Init();
+
+// Check if .janus directory exists
+bool isInit();
+
+// Lists all files in the working directory with a ".gpg" extension and print filenames without
+// extension.
 void list();
+
+/**
+ * Removes a password from the vault.
+ *
+ * @param name The name of the password to remove.
+ * @throw If the file "<name>.gpg" does not exist, program throw a filesystem error.
+ */
 void RemovePassword(const std::string &name);
+
+/**
+ * Adds a password to the vault.
+ *
+ * @param name The name of the password to add.
+ * @param key The keys to encrypt the password with.
+ * @throw If the file "<name>.gpg" already exists, program throw a filesystem error
+ * @throw If the file is not open, program throw a runtime error
+ * @throw If encryption fails, program throw a runtime error
+ */
 void AddPassword(const std::string &name, const std::vector<GpgME::Key> &keys);
+
+/**
+ * Shows a password from the vault.
+ *
+ * @param name The name of the password to show.
+ * @throw If the file "<name>.gpg" does not exist, program throw a filesystem error.
+ * @throw If the file is not open, program throw a runtime error.
+ * @throw If decryption fails, program throw a runtime error.
+ */
 void ShowPassword(const std::string &name);
 
 } // namespace janus

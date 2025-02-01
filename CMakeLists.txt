@@ -41,4 +41,7 @@ find_package(Gpgmepp REQUIRED)
 
 add_executable(${PROJECT_NAME} ${SOURCES})
 
-target_link_libraries(${PROJECT_NAME} Gpgmepp)
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(LIBGIT2 REQUIRED IMPORTED_TARGET libgit2)
+
+target_link_libraries(${PROJECT_NAME} PRIVATE PkgConfig::LIBGIT2 Gpgmepp)

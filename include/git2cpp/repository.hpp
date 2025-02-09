@@ -2,6 +2,7 @@
 #define REPOSITORY_HPP
 
 #include <git2.h>
+#include <git2/repository.h>
 #include <string>
 namespace Git {
 
@@ -69,6 +70,9 @@ public:
   // void commit(const std::string &message, Index index, Tree tree, Signature signature);
 
   void commitAll(const std::string &message);
+
+  git_repository *ptr() const;
+
 };
 
 } // namespace Git

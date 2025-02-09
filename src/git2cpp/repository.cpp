@@ -28,6 +28,8 @@ bool Repository::isInit() { return initialized; }
 
 const std::string Repository::Path() { return std::string(git_repository_workdir(_repo)); }
 
+git_repository* Repository::ptr() const {return _repo;}
+
 void Repository::commitAll(const std::string &message) {
   git_index *index;
   if (git_repository_index(&index, _repo) != 0) {

@@ -1,0 +1,35 @@
+#include <git2.h>
+#include <git2/commit.h>
+#include <git2/types.h>
+
+#include "git2cpp/commit.hpp"
+
+namespace Git {
+
+Commit::Commit() : _commit(nullptr) {}
+Commit::Commit(git_commit *commit) : _commit(commit) {}
+
+Commit::~Commit() {
+  if (_commit)
+    git_commit_free(_commit);
+}
+
+git_oid Commit::id() const { return *git_commit_id(_commit); }
+
+git_commit *Commit::ptr() const { return _commit; }
+
+Commit::Commit(Commit &&other) noexcept : _commit(other._commit) { other._commit = nullptr; }
+
+Commit &Commit::operator=(Commit &&other) noexcept {
+  if (this != &other) {
+    if (_commit) {
+      git_commit_free(_commit);
+    }
+    _commit = other._commit;
+    other._commit = nullptr;
+  }
+  return *this;
+}
+
+
+}; // namespace Git

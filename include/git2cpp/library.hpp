@@ -2,8 +2,6 @@
 #define LIBRARY_HPP
 
 #include <git2.h>
-#include <iostream>
-#include <string>
 
 namespace Git {
 

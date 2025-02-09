@@ -1,18 +1,15 @@
+#pragma once
 #ifndef ERROR_HPP
 #define ERROR_HPP
 
 #include <git2.h>
-#include <iostream>
-#include <string>
+#include <stdexcept>
 
 namespace Git {
 
-class Error : public std::runtime_error {
-  const git_error *error = git_error_last();
-
+class Exception : public std::runtime_error {
 public:
-  Error(const std::string &message);
-  const char *what() const noexcept override;
+  Exception();
 };
 
 } // namespace Git

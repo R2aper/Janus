@@ -1,9 +1,9 @@
-#include "git2cpp/error.hpp"
 #include <git2.h>
+
+#include "git2cpp/error.hpp"
 
 namespace Git {
 
-Error::Error(const std::string &message) : std::runtime_error(message) {}
-const char *Error::what() const noexcept { return error->message; }
+Exception::Exception() : std::runtime_error(git_error_last() ? git_error_last()->message: "Unknown Git error!") {}
 
 } // namespace Git

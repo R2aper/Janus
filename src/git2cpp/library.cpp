@@ -1,14 +1,4 @@
-#include <filesystem>
 #include <git2.h>
-#include <iostream>
-#include <string>
-
-/*
-Задача Git:
-* Создать если что репозиторий и коммитить изменения
-* Возможно стоит создать другой репозиторий с попыткой переноса libgit2 на C++
-
-*/
 
 #include "git2cpp/error.hpp"
 #include "git2cpp/library.hpp"
@@ -17,7 +7,7 @@ namespace Git {
 
 Git2Library::Git2Library() {
   if (git_libgit2_init() < 0)
-    throw Git::Error("Git error:");
+    throw Git::Exception();
 }
 
 Git2Library::~Git2Library() { git_libgit2_shutdown(); }

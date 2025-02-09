@@ -1,5 +1,5 @@
-#ifndef GITWRAPPER_HPP
-#define GITWRAPPER_HPP
+#ifndef LIBRARY_HPP
+#define LIBRARY_HPP
 
 #include <git2.h>
 #include <iostream>
@@ -20,4 +20,4 @@ public:
 
 } // namespace Git
 
-#endif
+#endif // LIBRARY_HPP

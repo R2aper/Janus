@@ -10,9 +10,8 @@
 
 */
 
-#include "error.hpp"
-#include "gitwrapper.hpp"
-#include "repo.hpp"
+#include "git2cpp/error.hpp"
+#include "git2cpp/library.hpp"
 
 namespace Git {
 

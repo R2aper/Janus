@@ -36,10 +36,11 @@ endif())
 
 include_directories(include)
 aux_source_directory(src SOURCES)
+aux_source_directory(src/git2cpp GIT2CPP_SOURCES)
 
 find_package(Gpgmepp REQUIRED)
 
-add_executable(${PROJECT_NAME} ${SOURCES})
+add_executable(${PROJECT_NAME} ${SOURCES} ${GIT2CPP_SOURCES})
 
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(LIBGIT2 REQUIRED IMPORTED_TARGET libgit2)

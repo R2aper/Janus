@@ -1,4 +1,4 @@
-#include "error.hpp"
+#include "git2cpp/error.hpp"
 #include <git2.h>
 
 namespace Git {

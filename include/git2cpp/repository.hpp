@@ -1,5 +1,5 @@
-#ifndef REPO_HPP
-#define REPO_HPP
+#ifndef REPOSITORY_HPP
+#define REPOSITORY_HPP
 
 #include <git2.h>
 #include <string>
@@ -10,7 +10,7 @@ namespace Git {
 // breanch
 // другие команды git связанные с репозиторием
 
-class Repo {
+class Repository {
 private:
   git_repository *_repo;
   bool initialized = false;
@@ -26,13 +26,13 @@ public:
    * @param rep The existing repository that would be open.
    * @throw Throw a std::runtime_error if the repository cannot be opened.
    */
-  Repo(git_repository *repo);
+  Repository(git_repository *repo);
 
   // Basic constructor. Create a new repository that is not initialized
-  Repo();
+  Repository();
 
   // Destructor. Free git_repository object
-  ~Repo();
+  ~Repository();
 
   /**
    * Opens an existing Git repository.
@@ -73,4 +73,4 @@ public:
 
 } // namespace Git
 
-#endif // REPO_HPP
+#endif // REPOSITORY_HPP

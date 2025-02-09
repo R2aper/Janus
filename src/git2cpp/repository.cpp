@@ -1,34 +1,34 @@
-#include "repo.hpp"
-#include "error.hpp"
+#include "git2cpp/repository.hpp"
+#include "git2cpp/error.hpp"
 #include <git2.h>
 #include <iostream>
 
 namespace Git {
 
-Repo::Repo(git_repository *repo) : _repo(repo) {}
-Repo::Repo() : _repo(nullptr) {}
-Repo::~Repo() { git_repository_free(_repo); }
+Repository::Repository(git_repository *repo) : _repo(repo) {}
+Repository::Repository() : _repo(nullptr) {}
+Repository::~Repository() { git_repository_free(_repo); }
 
-void Repo::Open() {
+void Repository::Open() {
   if (git_repository_open(&_repo, git_repository_workdir(_repo)) != 0) {
     throw Git::Error("Git error:");
   }
   opened = true;
 }
 
-bool Repo::isOpen() { return opened; }
+bool Repository::isOpen() { return opened; }
 
-void Repo::Init(const std::string &path) {
+void Repository::Init(const std::string &path) {
   if (git_repository_init(&_repo, path.c_str(), false) < 0)
     throw Git::Error("Git error:");
   initialized = true;
 }
 
-bool Repo::isInit() { return initialized; }
+bool Repository::isInit() { return initialized; }
 
-const std::string Repo::Path() { return std::string(git_repository_workdir(_repo)); }
+const std::string Repository::Path() { return std::string(git_repository_workdir(_repo)); }
 
-void Repo::commitAll(const std::string &message) {
+void Repository::commitAll(const std::string &message) {
   git_index *index;
   if (git_repository_index(&index, _repo) != 0) {
     throw Git::Error("Git error:");

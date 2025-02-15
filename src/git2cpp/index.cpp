@@ -1,8 +1,8 @@
 #include <git2.h>
-#include <strings.h>
+#include <string>
 
-#include "git2cpp/index.hpp"
 #include "git2cpp/error.hpp"
+#include "git2cpp/index.hpp"
 
 namespace Git {
 
@@ -26,7 +26,7 @@ void Index::AddFile(const std::string &path) {
   git_index_write(_index);
 }
 
-git_oid Index::WriteTree() {
+git_oid Index::WriteTree() const {
   git_oid tree_id;
   if (git_index_write_tree(&tree_id, _index) != 0)
     throw Exception();
@@ -48,4 +48,4 @@ Index &Index::operator=(Index &&other) noexcept {
   return *this;
 }
 
-} // namespace
+} // namespace Git

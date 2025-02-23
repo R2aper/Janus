@@ -13,7 +13,7 @@ Commit::~Commit() {
     git_commit_free(_commit);
 }
 
-git_oid Commit::id() const { return *git_commit_id(_commit); }
+git_oid Commit::id() const noexcept { return *git_commit_id(_commit); }
 
 void Commit::Lookup(const Repository &repo, git_reference *ref) {
   if (git_commit_lookup(&_commit, repo.ptr(), git_reference_target(ref)) != 0)

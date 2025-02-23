@@ -4,6 +4,7 @@
 
 #include <git2.h>
 
+#include "git2cpp/abstract.hpp"
 #include "git2cpp/repository.hpp"
 
 namespace Git {
@@ -11,28 +12,19 @@ namespace Git {
 class Repository;
 
 // Wrapper for git_commit
-class Commit {
-private:
-  git_commit *_commit;
-
+class Commit : public AbstractClass<Commit, git_commit, git_commit_free> {
 public:
   /* Basic constructor.
    *
    * Assign commit to nullptr
    */
-  Commit();
+  explicit Commit();
 
   /* Constructor
    *
    * @param commit Existing commit
    */
-  Commit(git_commit *commit);
-
-  /* Destructor
-   *
-   * Free commit if it is not nullptr
-   */
-  ~Commit();
+  explicit Commit(git_commit *commit);
 
   // @return commit id
   git_oid id() const noexcept;
@@ -45,14 +37,6 @@ public:
    * @throw Git::Exception if lookup fails
    */
   void Lookup(const Repository &repo, git_reference *ref);
-
-  git_commit *ptr() const;
-
-  Commit(const Commit &) = delete;
-  Commit &operator=(const Commit &) = delete;
-
-  Commit(Commit &&other) noexcept;
-  Commit &operator=(Commit &&other) noexcept;
 };
 
 }; // namespace Git

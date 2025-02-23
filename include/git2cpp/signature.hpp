@@ -4,23 +4,28 @@
 
 #include <git2.h>
 
+#include "git2cpp/abstract.hpp"
 #include "git2cpp/repository.hpp"
+
+// TODO: Signauture  from buffer
+// int git_signature_from_buffer(git_signature **out, const char *buf);
+
+// TODO: Signature from env
+// int git_signature_default_from_env(git_signature **author_out, git_signature **committer_out,
+// git_repository *repo);
 
 namespace Git {
 
 class Repository;
 
 // Wrapper for git_signature
-class Signature {
-private:
-  git_signature *_sig;
-
+class Signature : public AbstractClass<Signature, git_signature, git_signature_free> {
 public:
   /* Basic constructor.
    *
    * Assign signature to nullptr
    */
-  Signature();
+  explicit Signature();
 
   /* Constructor
    *
@@ -30,7 +35,7 @@ public:
    * @param email Email of the person
    * @throw Git::Exception if creating signature fails
    */
-  Signature(const std::string &name, const std::string &email);
+  explicit Signature(const std::string &name, const std::string &email);
 
   /* Constructor
    *
@@ -42,26 +47,14 @@ public:
    * @param offset Timezone offset (in minutes) for the time
    * @throw Git::Exception if creating signature fails
    */
-  Signature(const std::string &name, const std::string &email, git_time_t time, int offset);
-
-  // TODO: Signauture  from buffer
-  // int git_signature_from_buffer(git_signature **out, const char *buf);
-
-  // TODO: Signature from env
-  // int git_signature_default_from_env(git_signature **author_out, git_signature **committer_out,
-  // git_repository *repo);
+  explicit Signature(const std::string &name, const std::string &email, git_time_t time,
+                     int offset);
 
   /* Constructor
    *
    * @param sig Existing signature
    */
-  Signature(git_signature *sig);
-
-  /* Destructor
-   *
-   * Free signature if it is not nullptr
-   */
-  ~Signature();
+  explicit Signature(git_signature *sig);
 
   /* Create signature by taking default signature from git repository
    *
@@ -77,14 +70,6 @@ public:
    * Existing signature will be freed
    */
   void SetSig(git_signature *sig);
-
-  const git_signature *ptr() const;
-
-  Signature(const Signature &) = delete;
-  Signature &operator=(const Signature &) = delete;
-
-  Signature(Signature &&other) noexcept;
-  Signature &operator=(Signature &&other) noexcept;
 };
 
 } // namespace Git

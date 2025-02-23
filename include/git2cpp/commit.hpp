@@ -1,17 +1,22 @@
+#pragma once
 #ifndef COMMIT_HPP
 #define COMMIT_HPP
 
 #include <git2.h>
 
+#include "git2cpp/repository.hpp"
+
 namespace Git {
 
-// Wrapper for git_commit 
+class Repository;
+
+// Wrapper for git_commit
 class Commit {
 private:
   git_commit *_commit;
 
 public:
-   /* Basic constructor.
+  /* Basic constructor.
    *
    * Assign commit to nullptr
    */
@@ -32,16 +37,17 @@ public:
   // @return commit id
   git_oid id() const;
 
-  git_commit* ptr() const;
+  void Lookup(const Repository &repo, git_reference *ref);
+
+  git_commit *ptr() const;
 
   Commit(const Commit &) = delete;
   Commit &operator=(const Commit &) = delete;
 
   Commit(Commit &&other) noexcept;
   Commit &operator=(Commit &&other) noexcept;
-
 };
 
-}; // Git
+}; // namespace Git
 
 #endif // COMMIT_HPP

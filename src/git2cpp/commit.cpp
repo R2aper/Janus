@@ -1,6 +1,4 @@
 #include <git2.h>
-#include <git2/commit.h>
-#include <git2/types.h>
 
 #include "git2cpp/commit.hpp"
 
@@ -16,6 +14,10 @@ Commit::~Commit() {
 
 git_oid Commit::id() const { return *git_commit_id(_commit); }
 
+void Commit::Lookup(const Repository &repo, git_reference *ref) {
+  git_commit_lookup(&_commit, repo.ptr(), git_reference_target(ref));
+}
+
 git_commit *Commit::ptr() const { return _commit; }
 
 Commit::Commit(Commit &&other) noexcept : _commit(other._commit) { other._commit = nullptr; }
@@ -30,6 +32,5 @@ Commit &Commit::operator=(Commit &&other) noexcept {
   }
   return *this;
 }
-
 
 }; // namespace Git

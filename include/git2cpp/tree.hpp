@@ -4,31 +4,24 @@
 
 #include <git2.h>
 
+#include "git2cpp/abstract.hpp"
+
 namespace Git {
 
 // Wrapper for git_tree
-class Tree {
-private:
-  git_tree *_tree;
-
+class Tree : public AbstractClass<Tree, git_tree, git_tree_free> {
 public:
   /* Basic constructor
    *
    * Assign tree to nullptr
    */
-  Tree();
+  explicit Tree();
 
   /* Constructor
    *
    * @param tree Existing tree
    */
-  Tree(git_tree *tree);
-
-  /* Destructor
-   *
-   * Free tree if it is not nullptr
-   */
-  ~Tree();
+  explicit Tree(git_tree *tree);
 
   /*
    * Set a tree to given git_tree, old tree will be freed
@@ -39,14 +32,6 @@ public:
 
   // returns the tree's id
   git_oid id() const;
-
-  git_tree *ptr() const;
-
-  Tree(const Tree &) = delete;
-  Tree &operator=(const Tree &) = delete;
-
-  Tree(Tree &&other) noexcept;
-  Tree &operator=(Tree &&other) noexcept;
 };
 
 }; // namespace Git

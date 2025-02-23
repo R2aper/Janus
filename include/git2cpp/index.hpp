@@ -5,31 +5,24 @@
 #include <git2.h>
 #include <string>
 
+#include "git2cpp/abstract.hpp"
+
 namespace Git {
 
 // Wrapper for git_index
-class Index {
-private:
-  git_index *_index;
-
+class Index : public AbstractClass<Index, git_index, git_index_free> {
 public:
   /* Basic constructor.
    *
    * Assign index to nullptr
    */
-  Index();
+  explicit Index();
 
   /* Constructor
    *
    * @param index Existing index
    */
-  Index(git_index *index);
-
-  /* Destructor
-   *
-   * Free index if it is not nullptr
-   */
-  ~Index();
+  explicit Index(git_index *index);
 
   /*
    * Add all file to index from working git directory
@@ -53,14 +46,6 @@ public:
    * @return tree id
    */
   git_oid WriteTree() const;
-
-  git_index *ptr() const;
-
-  Index(const Index &) = delete;
-  Index &operator=(const Index &) = delete;
-
-  Index(Index &&other) noexcept;
-  Index &operator=(Index &&other) noexcept;
 };
 
 } // namespace Git

@@ -1,4 +1,5 @@
 #pragma once
+#include <git2/types.h>
 #ifndef REPOSITORY_HPP
 #define REPOSITORY_HPP
 
@@ -6,6 +7,7 @@
 #include <string>
 #include <vector>
 
+#include "git2cpp/abstract.hpp"
 #include "git2cpp/commit.hpp"
 #include "git2cpp/index.hpp"
 #include "git2cpp/signature.hpp"
@@ -17,9 +19,8 @@ class Signature;
 class Commit;
 
 // Wrapper for git_repository
-class Repository {
+class Repository : public AbstractClass<Repository, git_repository, git_repository_free> {
 private:
-  git_repository *_repo;
   bool initialized = false;
   bool opened = false;
 
@@ -29,7 +30,7 @@ public:
    * Initialized and open repository at current directory
    * @throw Git::Exception if repository cannot be opened or initialized
    */
-  Repository();
+  explicit Repository();
 
   /* Constructor
    *
@@ -37,7 +38,7 @@ public:
    * @param rep The initialized git repository.
    * @throw Git::Exception if repository cannot be opened or initialized
    */
-  Repository(git_repository *repo);
+  explicit Repository(git_repository *repo);
 
   /* Constructor.
    *
@@ -46,13 +47,7 @@ public:
    * @param path The path of initialized repository
    * @throw Git::Exception if repository cannot be opened
    */
-  Repository(const std::string &path);
-
-  /* Destructor.
-   *
-   * Free repository if it is not nullptr
-   */
-  ~Repository();
+  explicit Repository(const std::string &path);
 
   /*
    * Get the Index file for this repository.
@@ -154,14 +149,6 @@ public:
    */
   void CreateCommit(const std::string &message, const Signature &author, const Signature &commiter,
                     const Index &index, const std::string &target_branch = "master");
-
-  git_repository *ptr() const;
-
-  Repository(const Repository &) = delete;
-  Repository &operator=(const Repository &) = delete;
-
-  Repository(Repository &&other) noexcept;
-  Repository &operator=(Repository &&other) noexcept;
 };
 
 } // namespace Git

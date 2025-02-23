@@ -32,6 +32,7 @@ public:
 
   /*
    * Set a tree to given git_tree, old tree will be freed
+   *
    * @param tree Existing tree
    */
   void SetTree(git_tree *tree);

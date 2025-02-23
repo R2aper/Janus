@@ -10,6 +10,7 @@ namespace Git {
 
 class Repository;
 
+// Wrapper for git_signature
 class Signature {
 private:
   git_signature *_sig;
@@ -65,6 +66,7 @@ public:
   /* Create signature by taking default signature from git repository
    *
    * Existing signature will be freed
+   *
    * @param repo Existing git repository
    * @throw Git::Exception if taking default signature fails
    */

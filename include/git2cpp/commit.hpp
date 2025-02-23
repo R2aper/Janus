@@ -35,8 +35,15 @@ public:
   ~Commit();
 
   // @return commit id
-  git_oid id() const;
+  git_oid id() const noexcept;
 
+  /*
+   * Lookup a commit object from a repository.
+   *
+   * @param repo The repository to use when locating the Commit
+   * @param ref Direct reference
+   * @throw Git::Exception if lookup fails
+   */
   void Lookup(const Repository &repo, git_reference *ref);
 
   git_commit *ptr() const;

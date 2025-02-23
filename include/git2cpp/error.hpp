@@ -2,7 +2,6 @@
 #ifndef ERROR_HPP
 #define ERROR_HPP
 
-#include <git2.h>
 #include <stdexcept>
 
 namespace Git {

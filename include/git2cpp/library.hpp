@@ -2,8 +2,6 @@
 #ifndef LIBRARY_HPP
 #define LIBRARY_HPP
 
-#include <git2.h>
-
 namespace Git {
 
 // Class to initialize and shutdown the libgit2 library

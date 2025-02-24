@@ -1,5 +1,7 @@
+#include <error.h>
 #include <filesystem>
 #include <fstream>
+#include <global.h>
 #include <gpgme++/context.h>
 #include <gpgme++/data.h>
 #include <gpgme++/decryptionresult.h>
@@ -17,27 +19,26 @@ namespace fs = std::filesystem;
 
 namespace janus {
 
-GpgME::Context *GpgInit() {
-  // Check that library was not initialized before
-  static bool gpgme_initialized = false;
+static bool gpgme_initialized = false;
 
+void InitGpgME() {
   if (!gpgme_initialized) {
-    GpgME::initializeLibrary();
+
+    GpgME::initializeLibrary(); // Can fails or not?
     gpgme_initialized = true;
   }
+}
 
-  auto ctx = GpgME::Context::createForProtocol(GpgME::OpenPGP);
+GpgME::Context *CreateGpgContext(GpgME::Protocol protocol) {
+  auto ctx = GpgME::Context::createForProtocol(protocol);
   if (!ctx)
-    throw std::runtime_error("Error creating GPG context!");
-
-  //? Set pinentry mode to ask for password(Doesn't work)
-  ctx->setPinentryMode(GpgME::Context::PinentryMode::PinentryAsk);
+    throw GpgME::Error(); // FIX:
 
   return ctx;
 }
 
 std::vector<GpgME::Key> GetKeys(const std::string &key_id) { //!! Rewrite
-  auto ctx = GpgInit();
+  auto ctx = CreateGpgContext();
   std::vector<GpgME::Key> keys;
   GpgME::Error err;
   GpgME::Key key;
@@ -128,7 +129,7 @@ void AddPassword(const std::string &name, const std::vector<GpgME::Key> &keys) {
     content += it + "\n";
   }
 
-  auto ctx = GpgInit();
+  auto ctx = CreateGpgContext();
 
   GpgME::Data plainData(content.c_str(), content.size());
   GpgME::Data cipherData;
@@ -163,7 +164,7 @@ void ShowPassword(const std::string &name) {
 
   file.close();
 
-  auto ctx = GpgInit();
+  auto ctx = CreateGpgContext();
 
   GpgME::Data cipherData(cipherText.c_str(), cipherText.size());
   GpgME::Data plainData;

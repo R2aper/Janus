@@ -7,11 +7,9 @@ using namespace janus;
 
 /*
 TODO:
-
 ? What inside .janus
 * Reload cache of keys
 ? Parsing arguments, multiple passwords and etc
-* git track?
 * Error handling!!
 
 */
@@ -34,6 +32,8 @@ int main(int argc, char *argv[]) {
     usage();
     return 1;
   }
+
+  InitGpgME();
   std::string fingerprint;
 
   for (int i = 1; i < argc; i++) {

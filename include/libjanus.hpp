@@ -1,14 +1,23 @@
 #ifndef LIBJANUS_HPP
 #define LIBJANUS_HPP
 
+#include <global.h>
 #include <gpgme++/context.h>
 
 namespace janus {
 
-/// Initialize gpgme library and create GpgME::Context
-/// @return GpgME::Context pointer
-/// @throw Program throw runtime error if GpgME::Context creation fails
-GpgME::Context *GpgInit();
+/*
+ * Initialize GpgME library
+ */
+void InitGpgME();
+
+/*
+ *Create GpgME::Context with the provided protocol
+ *
+ * @param protocol Protocol to use(Default is OpenPGP)
+ * @throw GpgME::Error if context is not created
+ */
+GpgME::Context *CreateGpgContext(GpgME::Protocol protocol = GpgME::Protocol::OpenPGP);
 
 /**
  * Retrieves a list of GpgME::Key objects based on the provided key_id.

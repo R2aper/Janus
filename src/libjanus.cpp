@@ -39,36 +39,35 @@ GpgME::Context *CreateGpgContext(GpgME::Protocol protocol) {
   return ctx;
 }
 
-std::vector<GpgME::Key> GetKeys(const std::string &key_id) { //!! Rewrite
+std::vector<GpgME::Key> GetKeys(const std::string &key_id) {
   auto ctx = CreateGpgContext();
+
+  return key_id.empty() ? GetAllKeys(ctx) : GetKeyById(ctx, key_id);
+}
+
+std::vector<GpgME::Key> GetAllKeys(GpgME::Context *ctx) {
+  std::vector<GpgME::Key> keys;
+  GpgME::Error err = ctx->startKeyListing("", false);
+  while (!err) {
+    GpgME::Key key = ctx->nextKey(err);
+    if (key.isNull())
+      break;
+    if (key.canEncrypt()) {
+      keys.push_back(key);
+    }
+  }
+  ctx->endKeyListing();
+  return keys;
+}
+
+std::vector<GpgME::Key> GetKeyById(GpgME::Context *ctx, const std::string &key_id) {
   std::vector<GpgME::Key> keys;
   GpgME::Error err;
-  GpgME::Key key;
+  GpgME::Key key = ctx->key(key_id.c_str(), err);
 
-  if (key_id.empty()) {
-    err = ctx->startKeyListing("", false);
-    while (!err) {
-      key = ctx->nextKey(err);
-      if (key.isNull())
-        break;
-      if (key.canEncrypt())
-        keys.push_back(key);
-    }
-    ctx->endKeyListing();
-
-    if (keys.empty())
-      throw std::runtime_error("No suitable encryption keys found!");
-
-  } else {
-    key = ctx->key(key_id.c_str(), err);
-
-    if (key.isNull() || !key.canEncrypt())
-      throw std::runtime_error(
-          "Specified fingerprint does not correspond to a valid encryption key!");
-
+  if (!key.isNull() && key.canEncrypt()) {
     keys.push_back(key);
   }
-
   return keys;
 }
 
@@ -158,8 +157,9 @@ void SecureClear(std::vector<char> &data) noexcept {
   data.clear();
 }
 
-void AddPassword(const std::string &name, const std::vector<GpgME::Key> &keys) {
+void AddPassword(const std::string &name, const std::string &key_id) {
   auto ctx = CreateGpgContext();
+  std::vector<GpgME::Key> keys = GetKeys(key_id);
   fs::path file_path = name + ".gpg";
 
   // Get content from user

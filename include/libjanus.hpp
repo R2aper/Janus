@@ -56,6 +56,16 @@ void list();
  */
 void RemovePassword(const std::string &name);
 
+/* Get user input and hide it
+ * NOTE:: Add possibility to add multiple lines
+ *
+ * @return Vector of user input
+ */
+std::vector<char> Input() noexcept;
+
+// Fill a vector with null characters
+void SecureClear(std::vector<char> &data) noexcept;
+
 /**
  * Adds a password to the vault.
  *

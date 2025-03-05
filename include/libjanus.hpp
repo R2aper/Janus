@@ -85,12 +85,11 @@ void SecureClear(std::vector<char> &data) noexcept;
  * Adds a password to the vault.
  *
  * @param name The name of the password to add.
- * @param key The keys to encrypt the password with.
- * @throw If the file "<name>.gpg" already exists, program throw a filesystem error
+ * @param key_id The identifier of key. Should be used if you want to encrypt data with key
  * @throw If the file is not open, program throw a runtime error
  * @throw If encryption fails, program throw a runtime error
  */
-void AddPassword(const std::string &name, const std::vector<GpgME::Key> &keys);
+void AddPassword(const std::string &name, const std::string &key_id = "");
 
 /**
  * Shows a password from the vault.

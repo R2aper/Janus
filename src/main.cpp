@@ -1,4 +1,5 @@
 #include <iostream>
+#include <stdexcept>
 #include <string>
 
 #include "libjanus.hpp"
@@ -7,7 +8,6 @@ using namespace janus;
 
 /*
 TODO:
-? What inside .janus
 * Reload cache of keys
 ? Parsing arguments, multiple passwords and etc
 * Error handling!!
@@ -52,8 +52,7 @@ int main(int argc, char *argv[]) {
       i++;
       continue;
     } else if (!isInit()) {
-      std::cerr << "Error: not a vault directory: .janus" << std::endl;
-      return 1;
+      std::cerr << "Fatal!: directory is not a git repository" << std::endl;
 
     } else if (command == "remove" && argc > i + 1) {
       RemovePassword(argv[i + 1]);
@@ -64,7 +63,7 @@ int main(int argc, char *argv[]) {
       return 0;
 
     } else if (command == "add" && argc > i + 1) {
-      AddPassword(argv[i + 1], GetKeys(fingerprint));
+      AddPassword(argv[i + 1], fingerprint);
       return 0;
 
     } else if (command == "show" && argc > i + 1) {
@@ -72,7 +71,8 @@ int main(int argc, char *argv[]) {
       return 0;
 
     } else {
-      std::cerr << "Invalid command: " << command << std::endl;
+      //  std::cerr << "Invalid command: " << command << std::endl;
+      throw std::invalid_argument(argv[i]);
       return 1;
     }
   }

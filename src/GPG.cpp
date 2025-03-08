@@ -4,6 +4,7 @@
 #include <gpgme++/encryptionresult.h>
 #include <gpgme++/key.h>
 #include <gpgme++/keylistresult.h>
+#include <stdexcept>
 #include <string>
 #include <vector>
 
@@ -14,7 +15,7 @@ namespace janus {
 void InitGpgME() {
   if (!gpgme_initialized) {
 
-    GpgME::initializeLibrary(); // Can fails or not?
+    GpgME::initializeLibrary();
     gpgme_initialized = true;
   }
 }
@@ -22,29 +23,28 @@ void InitGpgME() {
 GpgME::Context *CreateGpgContext(GpgME::Protocol protocol) {
   auto ctx = GpgME::Context::createForProtocol(protocol);
   if (!ctx)
-    throw GpgME::Error(); // FIX:
+    throw std::runtime_error("GpgME error: Failed to create GpgME context!");
 
   return ctx;
 }
 
-std::vector<GpgME::Key> GetKeys(const std::string &key_id) {
-  auto ctx = CreateGpgContext();
-
+std::vector<GpgME::Key> GetKeys(GpgME::Context *ctx, const std::string &key_id) {
   return key_id.empty() ? GetAllKeys(ctx) : GetKeyById(ctx, key_id);
 }
 
 std::vector<GpgME::Key> GetAllKeys(GpgME::Context *ctx) {
   std::vector<GpgME::Key> keys;
   GpgME::Error err = ctx->startKeyListing("", false);
+
   while (!err) {
     GpgME::Key key = ctx->nextKey(err);
     if (key.isNull())
       break;
-    if (key.canEncrypt()) {
+    if (key.canEncrypt())
       keys.push_back(key);
-    }
   }
   ctx->endKeyListing();
+
   return keys;
 }
 
@@ -53,9 +53,9 @@ std::vector<GpgME::Key> GetKeyById(GpgME::Context *ctx, const std::string &key_i
   GpgME::Error err;
   GpgME::Key key = ctx->key(key_id.c_str(), err);
 
-  if (!key.isNull() && key.canEncrypt()) {
+  if (!key.isNull() && key.canEncrypt())
     keys.push_back(key);
-  }
+
   return keys;
 }
 

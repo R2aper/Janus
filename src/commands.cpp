@@ -55,7 +55,7 @@ void RemovePassword(const std::string &name) {
 
 void AddPassword(const std::string &name, const std::string &key_id) {
   auto ctx = CreateGpgContext();
-  std::vector<GpgME::Key> keys = GetKeys(key_id);
+  std::vector<GpgME::Key> keys = GetKeys(ctx, key_id);
 
   if (keys.empty())
     throw std::invalid_argument("No keys to encrypt with!");

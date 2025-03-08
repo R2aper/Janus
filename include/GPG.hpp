@@ -16,7 +16,7 @@ void InitGpgME();
  *Create GpgME::Context with the provided protocol
  *
  * @param protocol Protocol to use(Default is OpenPGP)
- * @throw GpgME::Error if context is not created
+ * @throw std::runtime_error if context is not created
  */
 GpgME::Context *CreateGpgContext(GpgME::Protocol protocol = GpgME::Protocol::OpenPGP);
 
@@ -24,14 +24,13 @@ GpgME::Context *CreateGpgContext(GpgME::Protocol protocol = GpgME::Protocol::Ope
   *Retrieves a list of GpgME::Key objects based on the provided key_id.
   *
   * If key_id is empty, it returns all available keys that can be used for encryption.
-  * If key_id is specified, it retrieves the key associated with the given key_id and ensures that
-  the key can be used for encryption.
-  *
-  * @param key_id The identifier of key to Retrieves
+  * If key_id is specified, it retrieves the key associated with the given key_id
+  * @param ctx The GpgME::Context object to use for retrieving keys
+  * @param key_id The identifier of key to retrieves(Default is empty)
   * @return A vector of GpgME::Key objects
 
  */
-std::vector<GpgME::Key> GetKeys(const std::string &key_id = "");
+std::vector<GpgME::Key> GetKeys(GpgME::Context *ctx, const std::string &key_id = "");
 
 /*
  * Returns a list of all available keys that can be used for encryption
@@ -41,7 +40,7 @@ std::vector<GpgME::Key> GetKeys(const std::string &key_id = "");
  */
 std::vector<GpgME::Key> GetAllKeys(GpgME::Context *ctx);
 
-/* Return a key by key_id
+/* Return a key by it's fingerprint
  *
  * @param ctx The GpgME::Context object to use for retrieving key
  * @param key_id The key identifier

@@ -4,17 +4,6 @@
 
 namespace janus {
 
-/**
- * Initializes a new vault in the current working directory.
- *
- * @throw If the directory ".janus" already exists in the current working
- * directory or if the creation of the directory fails, program thrown a filesystem error.
- */
-void Init();
-
-// Check if .janus directory exists
-bool isInit();
-
 // Lists all files in the working directory with a ".gpg" extension and print filenames without
 // extension.
 void list();

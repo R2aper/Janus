@@ -1,11 +1,14 @@
+#include <filesystem>
 #include <iostream>
-#include <stdexcept>
 #include <string>
 
 #include "GPG.hpp"
 #include "commands.hpp"
+#include "git2cpp/error.hpp"
+#include "git2cpp/repository.hpp"
 
 using namespace janus;
+namespace fs = std::filesystem;
 
 /*
 TODO:
@@ -15,13 +18,18 @@ TODO:
 
 */
 
+// --create-branch <name_of_branch>
+// -b <name_of_branch> commit in specified branch
+// sign
+// symetric
+// to file
 void usage() {
   std::cout << "Usage: janus [Options] <command> \n\
 Options: \n\
   -h, --help            Show this help message\n\
   -k <fingerprint>      Enter fingerprint of the key to encrypt the password with(In default passwords encrypted with all available keys)\n\
-Command: \n\
-  init                  Initialize a new vault in the current working directory\n\
+Commands: \n\
+  init                  Initialize a new git repository in the current working directory(Similar to git init)\n\
   list                  List all passwords in the vault\n\
   add <name>            Add a new password to the vault\n\
   remove <name>         Remove a password from the vault\n\
@@ -45,7 +53,14 @@ int main(int argc, char *argv[]) {
       return 0;
 
     } else if (command == "init") {
-      Init();
+      try {
+        Git::Repository rep;
+        std::cout << "Initializing git repository at " << rep.Path() << std::endl;
+
+      } catch (const Git::Exception &e) {
+        std::cerr << e.what() << std::endl;
+        return 1;
+      }
 
       return 0;
 
@@ -53,8 +68,9 @@ int main(int argc, char *argv[]) {
       fingerprint = argv[i + 1];
       i++;
       continue;
-    } else if (!isInit()) {
+    } else if (fs::exists(".git")) {
       std::cerr << "Fatal!: directory is not a git repository" << std::endl;
+      return 1;
 
     } else if (command == "remove" && argc > i + 1) {
       RemovePassword(argv[i + 1]);
@@ -73,8 +89,7 @@ int main(int argc, char *argv[]) {
       return 0;
 
     } else {
-      //  std::cerr << "Invalid command: " << command << std::endl;
-      throw std::invalid_argument(argv[i]);
+      std::cerr << "Invalid command: " << command << std::endl;
       return 1;
     }
   }

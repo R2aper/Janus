@@ -15,20 +15,6 @@ namespace fs = std::filesystem;
 
 namespace janus {
 
-void Init() { // FIX: Should be repo
-  if (fs::exists(".janus"))
-    throw fs::filesystem_error(".janus", std::error_code(EEXIST, std::system_category()));
-
-  fs::create_directory(".janus");
-
-  if (!fs::exists(".janus"))
-    throw fs::filesystem_error(".janus", std::error_code(EAGAIN, std::system_category())); //?
-
-  std::cout << "Initialized Vault in " << fs::absolute(".janus") << std::endl;
-}
-
-bool isInit() { return fs::exists(".janus"); }
-
 void list() {
   fs::path dir = fs::current_path();
   for (const auto &entry : fs::directory_iterator(dir)) {

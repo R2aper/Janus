@@ -12,7 +12,7 @@
 #include "git2cpp/index.hpp"
 #include "git2cpp/repository.hpp"
 #include "git2cpp/signature.hpp"
-#include "libjanus.hpp"
+#include "utils.hpp"
 
 namespace fs = std::filesystem;
 

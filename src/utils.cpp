@@ -7,7 +7,7 @@
 #include <termios.h>
 #include <unistd.h>
 #endif
-#include "libjanus.hpp"
+#include "utils.hpp"
 
 namespace Janus {
 

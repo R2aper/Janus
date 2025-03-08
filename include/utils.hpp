@@ -1,6 +1,4 @@
 #pragma once
-#ifndef LIBJANUS_HPP
-#define LIBJANUS_HPP
 
 #include <gpgme++/context.h>
 #include <string>
@@ -36,5 +34,3 @@ void WriteToFile(const std::string &file_path, const std::string &content);
 std::vector<char> ReadFromFile(const std::string &file_path);
 
 } // namespace Janus
-
-#endif

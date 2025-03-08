@@ -2,7 +2,8 @@
 #include <stdexcept>
 #include <string>
 
-#include "libjanus.hpp"
+#include "GPG.hpp"
+#include "commands.hpp"
 
 using namespace janus;
 
@@ -45,6 +46,7 @@ int main(int argc, char *argv[]) {
 
     } else if (command == "init") {
       Init();
+
       return 0;
 
     } else if (command == "-k" && argc > i + 1) {

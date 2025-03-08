@@ -13,6 +13,7 @@ void list();
  *
  * @param name The name of the password to remove.
  * @throw If the file "<name>.gpg" does not exist, program throw a filesystem error.
+ * @throw Git::Exception if creating commit fails
  */
 void RemovePassword(const std::string &name);
 
@@ -24,6 +25,7 @@ void RemovePassword(const std::string &name);
  * @throw std::invalid_argument if no keys are available
  * @throw std::ios_base::failure if writing to file fails
  * @throw std::runtime_error if encryption fails
+ * @throw Git::Exception if creating commit fails
  */
 void AddPassword(const std::string &name, const std::string &key_id = "");
 

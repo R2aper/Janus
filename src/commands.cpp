@@ -9,6 +9,9 @@
 
 #include "GPG.hpp"
 #include "commands.hpp"
+#include "git2cpp/index.hpp"
+#include "git2cpp/repository.hpp"
+#include "git2cpp/signature.hpp"
 #include "libjanus.hpp"
 
 namespace fs = std::filesystem;
@@ -33,9 +36,18 @@ void RemovePassword(const std::string &name) {
   std::string input;
   std::cout << "Do you want to delete " << name << "?[y/n]: ";
   std::cin >> input;
-  if (input == "y")
+  if (input == "y") {
     fs::remove(file_path);
-  else
+
+    // Open git and commit changes
+    Git::Repository rep("./");
+    Git::Signature sig;
+    sig.CreateDefault(rep);
+    Git::Index index = rep.GetIndex();
+    index.AddAllFiles();
+    rep.CreateCommit("Removed password: " + name, sig, sig, index);
+
+  } else
     return;
 }
 
@@ -64,6 +76,14 @@ void AddPassword(const std::string &name, const std::string &key_id) {
   }
 
   WriteToFile(file_path, cipherData.toString());
+
+  // Open repo and commit changes
+  Git::Repository rep;
+  Git::Signature sig;
+  sig.CreateDefault(rep);
+  Git::Index index = rep.GetIndex();
+  index.AddFile(file_path);
+  rep.CreateCommit("Added password: " + name, sig, sig, index);
 }
 
 void ShowPassword(const std::string &name) {

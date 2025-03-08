@@ -5,6 +5,7 @@
 #include "GPG.hpp"
 #include "commands.hpp"
 #include "git2cpp/error.hpp"
+#include "git2cpp/library.hpp"
 #include "git2cpp/repository.hpp"
 
 using namespace janus;
@@ -42,6 +43,7 @@ int main(int argc, char *argv[]) {
     return 1;
   }
 
+  Git::Git2Library lib;
   InitGpgME();
   std::string fingerprint;
 

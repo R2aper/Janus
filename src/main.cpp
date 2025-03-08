@@ -60,7 +60,7 @@ int main(int argc, char *argv[]) {
         std::cout << "Initializing git repository at " << rep.Path() << std::endl;
 
       } catch (const Git::Exception &e) {
-        std::cerr << e.what() << std::endl;
+        std::cerr << std::endl << e.what() << std::endl;
         return 1;
       }
       return 0;
@@ -71,12 +71,12 @@ int main(int argc, char *argv[]) {
       continue;
 
     } else if (!fs::exists(".git")) {
-      std::cerr << "Fatal!: directory is not a git repository" << std::endl;
+      std::cerr << std::endl << "Fatal!: directory is not a git repository" << std::endl;
       return 1;
 
     } else if (command == "remove" && argc > i + 1) {
       if (!fs::exists(std::string(argv[i + 1]) + ".gpg")) {
-        std::cerr << "Fatal: " << argv[i + 1] << " does not exist!" << std::endl;
+        std::cerr << std::endl << "Fatal: " << argv[i + 1] << " does not exist!" << std::endl;
         return 1;
       }
 
@@ -84,7 +84,7 @@ int main(int argc, char *argv[]) {
         RemovePassword(argv[i + 1]);
 
       } catch (const std::exception &e) {
-        std::cerr << e.what() << std::endl;
+        std::cerr << std::endl << e.what() << std::endl;
         return 1;
       }
       return 0;
@@ -95,7 +95,7 @@ int main(int argc, char *argv[]) {
 
     } else if (command == "add" && argc > i + 1) {
       if (fs::exists(std::string(argv[i + 1]) + ".gpg")) {
-        std::cerr << "Fatal: " << argv[i + 1] << " already exist!" << std::endl;
+        std::cerr << std::endl << "Fatal: " << argv[i + 1] << " already exist!" << std::endl;
         return 1;
       }
 
@@ -103,14 +103,14 @@ int main(int argc, char *argv[]) {
         AddPassword(argv[i + 1], fingerprint);
 
       } catch (const std::exception &e) {
-        std::cerr << e.what() << std::endl;
+        std::cerr << std::endl << e.what() << std::endl;
         return 1;
       }
       return 0;
 
     } else if (command == "show" && argc > i + 1) {
       if (!fs::exists(std::string(argv[i + 1]) + ".gpg")) {
-        std::cerr << "Fatal: " << argv[i + 1] << " does not exist!" << std::endl;
+        std::cerr << std::endl << "Fatal: " << argv[i + 1] << " does not exist!" << std::endl;
         return 1;
       }
 
@@ -118,13 +118,13 @@ int main(int argc, char *argv[]) {
         ShowPassword(argv[i + 1]);
 
       } catch (const std::exception &e) {
-        std::cerr << e.what() << std::endl;
+        std::cerr << std::endl << e.what() << std::endl;
         return 1;
       }
       return 0;
 
     } else {
-      std::cerr << "Invalid command: " << command << std::endl;
+      std::cerr << std::endl << "Invalid command: " << command << std::endl;
       return 1;
     }
   }

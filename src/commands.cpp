@@ -30,9 +30,6 @@ void list() {
 void RemovePassword(const std::string &name) {
   fs::path file_path = name + ".gpg";
 
-  if (!fs::exists(file_path))
-    throw fs::filesystem_error(file_path, std::error_code(ENOENT, std::system_category()));
-
   std::string input;
   std::cout << "Do you want to delete " << name << "?[y/n]: ";
   std::cin >> input;

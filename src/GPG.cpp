@@ -10,7 +10,7 @@
 
 #include "GPG.hpp"
 
-namespace janus {
+namespace Janus {
 
 void InitGpgME() {
   if (!gpgme_initialized) {
@@ -59,4 +59,4 @@ std::vector<GpgME::Key> GetKeyById(GpgME::Context *ctx, const std::string &key_i
   return keys;
 }
 
-} // namespace janus
+} // namespace Janus

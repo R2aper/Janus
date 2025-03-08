@@ -6,7 +6,7 @@
 #include <string>
 #include <vector>
 
-namespace janus {
+namespace Janus {
 
 /* Get user input and hide it
  * NOTE:: Add possibility to add multiple lines
@@ -35,6 +35,6 @@ void WriteToFile(const std::string &file_path, const std::string &content);
  */
 std::vector<char> ReadFromFile(const std::string &file_path);
 
-} // namespace janus
+} // namespace Janus
 
 #endif

@@ -8,7 +8,7 @@
 #include "git2cpp/library.hpp"
 #include "git2cpp/repository.hpp"
 
-using namespace janus;
+using namespace Janus;
 namespace fs = std::filesystem;
 
 /*
@@ -90,7 +90,7 @@ int main(int argc, char *argv[]) {
       return 0;
 
     } else if (command == "list") {
-      list();
+      List();
       return 0;
 
     } else if (command == "add" && argc > i + 1) {

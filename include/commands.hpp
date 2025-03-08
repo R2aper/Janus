@@ -2,11 +2,11 @@
 
 #include <string>
 
-namespace janus {
+namespace Janus {
 
 // Lists all files in the working directory with a ".gpg" extension and print filenames without
 // extension.
-void list();
+void List();
 
 /**
  * Removes a password from the vault.
@@ -38,4 +38,4 @@ void AddPassword(const std::string &name, const std::string &key_id = "");
  */
 void ShowPassword(const std::string &name);
 
-} // namespace janus
+} // namespace Janus

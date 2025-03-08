@@ -16,9 +16,9 @@
 
 namespace fs = std::filesystem;
 
-namespace janus {
+namespace Janus {
 
-void list() {
+void List() {
   fs::path dir = fs::current_path();
   for (const auto &entry : fs::directory_iterator(dir)) {
     if (entry.path().extension() == ".gpg") {
@@ -99,4 +99,4 @@ void ShowPassword(const std::string &name) {
   std::cout << plainData.toString() << std::endl;
 }
 
-} // namespace janus
+} // namespace Janus

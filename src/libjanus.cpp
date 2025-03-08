@@ -9,7 +9,7 @@
 #endif
 #include "libjanus.hpp"
 
-namespace janus {
+namespace Janus {
 
 std::vector<char> Input() noexcept {
   std::vector<char> input;
@@ -84,4 +84,4 @@ std::vector<char> ReadFromFile(const std::string &file_path) {
   return a;
 }
 
-} // namespace janus
+} // namespace Janus

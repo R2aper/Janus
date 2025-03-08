@@ -3,7 +3,7 @@
 #include <gpgme++/context.h>
 #include <gpgme++/key.h>
 
-namespace janus {
+namespace Janus {
 
 static bool gpgme_initialized = false;
 
@@ -48,4 +48,4 @@ std::vector<GpgME::Key> GetAllKeys(GpgME::Context *ctx);
  */
 std::vector<GpgME::Key> GetKeyById(GpgME::Context *ctx, const std::string &key_id);
 
-} // namespace janus
+} // namespace Janus

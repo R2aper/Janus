@@ -1,3 +1,4 @@
+#include <fstream>
 #include <iostream>
 #include <vector>
 #ifdef _WIN32 // For input
@@ -56,6 +57,31 @@ std::vector<char> Input() noexcept {
 void SecureClear(std::vector<char> &data) noexcept {
   std::fill(data.begin(), data.end(), '\0');
   data.clear();
+}
+
+void WriteToFile(const std::string &file_path, const std::string &content) {
+  std::ofstream file;
+
+  file.exceptions(std::ifstream::failbit |
+                  std::ifstream::badbit); // Let std::ofstream throw exceptions
+
+  file.open(file_path, std::ios::binary);
+  file.write(content.c_str(), content.size());
+
+  file.close();
+}
+
+std::vector<char> ReadFromFile(const std::string &file_path) {
+  std::ifstream file;
+
+  file.exceptions(std::ifstream::failbit |
+                  std::ifstream::badbit); // Let std::ifstream throw exceptions
+
+  file.open(file_path, std::ios::binary);
+  std::vector<char> a((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+
+  file.close();
+  return a;
 }
 
 } // namespace janus

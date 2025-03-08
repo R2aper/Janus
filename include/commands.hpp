@@ -27,23 +27,23 @@ void list();
  */
 void RemovePassword(const std::string &name);
 
-/**
+/*
  * Adds a password to the vault.
  *
  * @param name The name of the password to add.
- * @param key_id The identifier of key. Should be used if you want to encrypt data with key
- * @throw If the file is not open, program throw a runtime error
- * @throw If encryption fails, program throw a runtime error
+ * @param key_id The identifier of key. Should be used if you want to encrypt data with specific key
+ * @throw std::invalid_argument if no keys are available
+ * @throw std::ios_base::failure if writing to file fails
+ * @throw std::runtime_error if encryption fails
  */
 void AddPassword(const std::string &name, const std::string &key_id = "");
 
-/**
+/*
  * Shows a password from the vault.
  *
  * @param name The name of the password to show.
- * @throw If the file "<name>.gpg" does not exist, program throw a filesystem error.
- * @throw If the file is not open, program throw a runtime error.
- * @throw If decryption fails, program throw a runtime error.
+ * @throw std::ios_base::failure if reading from file fails
+ * @throw std::runtime_error if decryption fails
  */
 void ShowPassword(const std::string &name);
 

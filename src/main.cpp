@@ -63,19 +63,30 @@ int main(int argc, char *argv[]) {
         std::cerr << e.what() << std::endl;
         return 1;
       }
-
       return 0;
 
     } else if (command == "-k" && argc > i + 1) {
       fingerprint = argv[i + 1];
       i++;
       continue;
-    } else if (fs::exists(".git")) {
+
+    } else if (!fs::exists(".git")) {
       std::cerr << "Fatal!: directory is not a git repository" << std::endl;
       return 1;
 
     } else if (command == "remove" && argc > i + 1) {
-      RemovePassword(argv[i + 1]);
+      if (!fs::exists(std::string(argv[i + 1]) + ".gpg")) {
+        std::cerr << "Fatal: " << argv[i + 1] << " does not exist!" << std::endl;
+        return 1;
+      }
+
+      try {
+        RemovePassword(argv[i + 1]);
+
+      } catch (const std::exception &e) {
+        std::cerr << e.what() << std::endl;
+        return 1;
+      }
       return 0;
 
     } else if (command == "list") {
@@ -83,11 +94,33 @@ int main(int argc, char *argv[]) {
       return 0;
 
     } else if (command == "add" && argc > i + 1) {
-      AddPassword(argv[i + 1], fingerprint);
+      if (fs::exists(std::string(argv[i + 1]) + ".gpg")) {
+        std::cerr << "Fatal: " << argv[i + 1] << " already exist!" << std::endl;
+        return 1;
+      }
+
+      try {
+        AddPassword(argv[i + 1], fingerprint);
+
+      } catch (const std::exception &e) {
+        std::cerr << e.what() << std::endl;
+        return 1;
+      }
       return 0;
 
     } else if (command == "show" && argc > i + 1) {
-      ShowPassword(argv[i + 1]);
+      if (!fs::exists(std::string(argv[i + 1]) + ".gpg")) {
+        std::cerr << "Fatal: " << argv[i + 1] << " does not exist!" << std::endl;
+        return 1;
+      }
+
+      try {
+        ShowPassword(argv[i + 1]);
+
+      } catch (const std::exception &e) {
+        std::cerr << e.what() << std::endl;
+        return 1;
+      }
       return 0;
 
     } else {
@@ -95,5 +128,6 @@ int main(int argc, char *argv[]) {
       return 1;
     }
   }
+
   return 0;
 }

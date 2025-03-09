@@ -1,7 +1,4 @@
 #pragma once
-#include <git2/types.h>
-#ifndef REPOSITORY_HPP
-#define REPOSITORY_HPP
 
 #include <git2.h>
 #include <string>
@@ -152,5 +149,3 @@ public:
 };
 
 } // namespace Git
-
-#endif // REPOSITORY_HPP

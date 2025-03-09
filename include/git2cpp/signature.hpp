@@ -1,6 +1,4 @@
 #pragma once
-#ifndef SIGNATURE_HPP
-#define SIGNATURE_HPP
 
 #include <git2.h>
 
@@ -73,5 +71,3 @@ public:
 };
 
 } // namespace Git
-
-#endif // SIGNATURE_HPP

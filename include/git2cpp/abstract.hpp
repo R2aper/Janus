@@ -1,6 +1,4 @@
 #pragma once
-#ifndef ABSTRACT_HPP
-#define ABSTRACT_HPP
 
 namespace Git {
 
@@ -48,5 +46,3 @@ public:
 };
 
 } // namespace Git
-
-#endif // ABSTRACT_HPP

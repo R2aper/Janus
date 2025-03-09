@@ -1,6 +1,4 @@
 #pragma once
-#ifndef ERROR_HPP
-#define ERROR_HPP
 
 #include <stdexcept>
 
@@ -12,5 +10,3 @@ public:
 };
 
 } // namespace Git
-
-#endif // ERROR_HPP

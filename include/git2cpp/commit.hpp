@@ -1,6 +1,4 @@
 #pragma once
-#ifndef COMMIT_HPP
-#define COMMIT_HPP
 
 #include <git2.h>
 
@@ -40,5 +38,3 @@ public:
 };
 
 }; // namespace Git
-
-#endif // COMMIT_HPP

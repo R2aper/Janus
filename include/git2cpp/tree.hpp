@@ -1,6 +1,4 @@
 #pragma once
-#ifndef TREE_HPP
-#define TREE_HPP
 
 #include <git2.h>
 
@@ -35,5 +33,3 @@ public:
 };
 
 }; // namespace Git
-
-#endif // TREE_HPP

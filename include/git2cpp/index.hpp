@@ -1,6 +1,4 @@
 #pragma once
-#ifndef INDEX_HPP
-#define INDEX_HPP
 
 #include <git2.h>
 #include <string>
@@ -49,5 +47,3 @@ public:
 };
 
 } // namespace Git
-
-#endif // INDEX_HPP

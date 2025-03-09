@@ -1,4 +1,5 @@
 #include <filesystem>
+#include <gpgme++/gpgmepp_version.h>
 #include <iostream>
 #include <string>
 
@@ -7,27 +8,35 @@
 #include "git2cpp/error.hpp"
 #include "git2cpp/library.hpp"
 #include "git2cpp/repository.hpp"
+#include "utils.hpp"
 
 using namespace Janus;
 namespace fs = std::filesystem;
 
+// argparse
 /*
 TODO:
-* Reload cache of keys
-? Parsing arguments, multiple passwords and etc
+! Parsing arguments, multiple passwords and etc
 * Error handling!!
+* Git2
+* Readme + license + wiki
 
 */
 
+// class parserarg
+
+// --quiet don't create commit
 // --create-branch <name_of_branch>
-// -b <name_of_branch> commit in specified branch
-// sign
-// symetric
-// to file
+// -b --branch <name_of_branch> commit in specified branch
+// sign <name> encrypt and sign passw(Add passw to vault)
+// verify <name> verify a signature of passw(Prints signature not content of passw)
+// --symetric(encrypt flags)
+// -o <name_of_file> <name> save passw to file
 void usage() {
   std::cout << "Usage: janus [Options] <command> \n\
 Options: \n\
   -h, --help            Show this help message\n\
+  -v, --version         Show version of janus and used libraries\n\
   -k <fingerprint>      Enter fingerprint of the key to encrypt the password with(In default passwords encrypted with all available keys)\n\
 Commands: \n\
   init                  Initialize a new git repository in the current working directory(Similar to git init)\n\
@@ -35,6 +44,13 @@ Commands: \n\
   add <name>            Add a new password to the vault\n\
   remove <name>         Remove a password from the vault\n\
   show <name>           Show a password from the vault\n";
+}
+
+void version(const Git::Git2Library &lib) {
+  std::cout << "janus " << JANUS_VERSION << std::endl
+            << "libgit2 " << lib.Version() << std::endl
+            << "gpgmepp " << GPGMEPP_VERSION_STRING << std::endl;
+  // TODO: dirhome
 }
 
 int main(int argc, char *argv[]) {
@@ -52,6 +68,10 @@ int main(int argc, char *argv[]) {
 
     if (command == "-h" || command == "--help") {
       usage();
+      return 0;
+
+    } else if (command == "-v" || command == "--version") {
+      version(lib);
       return 0;
 
     } else if (command == "init") {

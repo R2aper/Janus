@@ -8,8 +8,7 @@ namespace Janus {
 
 #define JANUS_VERSION "1.2"
 
-/* Get user input and hide it
- * NOTE:: Add possibility to add multiple lines
+/* Get user input until the empty line and hide it by '*'
  *
  * @return Vector of user input
  */

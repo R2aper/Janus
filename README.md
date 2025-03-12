@@ -3,7 +3,6 @@
 Janus is a simple password manager based on GnuPG. This project is designed to provide a secure and simple way to manage your passwords.
 
 ## Why?
-
 It's my first real project on C++, so for the most part is learning, but i also want to just make storing password easier
 
 ## Features
@@ -63,9 +62,9 @@ make
 ```bash
 janus -k Myemail@gmail.com add Google  Add password with name "Google" that encrypt with key that have fingerprint "Myemail@gmail.com"
 
-janus -q remove <service_name>         Remove password and commit changes
+janus -q remove Github         Remove password with name and not commit changes
 ```
 
 ## License
 
-This project is licensed under the MIT License. See the [LICENSE](https://github.com/R2aper/LICENSE.md) file for details.
+This project is licensed under the MIT License. See the [LICENSE](https://github.com/R2aper/Janus/blob/main/LICENSE.md) file for details.

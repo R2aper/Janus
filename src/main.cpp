@@ -17,19 +17,18 @@ namespace fs = std::filesystem;
 
 /*
 TODO:
-* Add new options
-* Class options?
+* Rewrite options.cpp
 * Git2
 * Readme + license + wiki
+* New arguments:
+  -b --branch <name_of_branch> commit in specified branch
+  Encryption/Decryption flags
+  sign <name> encrypt and sign passw(Add passw to vault)
+  verify <name> verify a signature of passw(Prints signature not content of passw)
+  -o --output <name_of_file> <name> save passw to file(Not printing it)
 
 */
 
-// --quiet don't create commit
-// -b --branch <name_of_branch> commit in specified branch
-// sign <name> encrypt and sign passw(Add passw to vault)
-// verify <name> verify a signature of passw(Prints signature not content of passw)
-// --symetric(encrypt flags)
-// -o <name_of_file> <name> save passw to file
 void usage() {
   std::cout << "Usage: janus [Options] <command> \n\
 Options: \n\

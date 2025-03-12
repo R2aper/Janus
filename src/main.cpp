@@ -1,11 +1,13 @@
+#include <exception>
 #include <filesystem>
 #include <gpgme++/gpgmepp_version.h>
 #include <iostream>
+#include <ostream>
 #include <string>
 
 #include "GPG.hpp"
+#include "argparser.hpp"
 #include "commands.hpp"
-#include "git2cpp/error.hpp"
 #include "git2cpp/library.hpp"
 #include "git2cpp/repository.hpp"
 #include "utils.hpp"
@@ -53,6 +55,20 @@ void version(const Git::Git2Library &lib) {
   // TODO: dirhome
 }
 
+void arguments(ArgParser &parser) {
+  parser.AddArg("-h", "--help", ArgType::FLAG);
+  parser.AddArg("-k", "", ArgType::OPTION); // MULTIPLEOPTION
+  parser.AddArg("-v", "--version", ArgType::FLAG);
+  //  parser.AddArg("-q", "--quiet", ArgType::FLAG);
+  parser.AddArg("", "list", ArgType::FLAG);
+  parser.AddArg("", "init", ArgType::FLAG);
+  parser.AddArg("", "add", ArgType::OPTION);
+  //  parser.AddArg("", "sign", ArgType::OPTION);
+  parser.AddArg("", "remove", ArgType::OPTION);
+  parser.AddArg("", "show", ArgType::OPTION);
+  //  parser.AddArg("", "verify", ArgType::OPTION);
+}
+
 int main(int argc, char *argv[]) {
   if (argc < 2) {
     usage();
@@ -61,93 +77,74 @@ int main(int argc, char *argv[]) {
 
   Git::Git2Library lib;
   InitGpgME();
-  std::string fingerprint;
+  // std::vector<std::string> fingerprints;
+  std::string name, fingerprint;
+  ArgParser parser;
+  arguments(parser);
 
-  for (int i = 1; i < argc; i++) {
-    std::string command = argv[i];
+  try {
+    parser.Parse(argc, argv);
 
-    if (command == "-h" || command == "--help") {
+    if (parser.isSet("-h")) {
       usage();
       return 0;
+    }
 
-    } else if (command == "-v" || command == "--version") {
+    if (parser.isSet("-v")) {
       version(lib);
       return 0;
+    }
 
-    } else if (command == "init") {
-      try {
-        Git::Repository rep;
-        std::cout << "Initializing git repository at " << rep.Path() << std::endl;
+    if (!fs::exists(".git"))
+      throw std::runtime_error("Fatal! Not a git repository");
 
-      } catch (const Git::Exception &e) {
-        std::cerr << std::endl << e.what() << std::endl;
-        return 1;
-      }
-      return 0;
-
-    } else if (command == "-k" && argc > i + 1) {
-      fingerprint = argv[i + 1];
-      i++;
-      continue;
-
-    } else if (!fs::exists(".git")) {
-      std::cerr << std::endl << "Fatal!: directory is not a git repository" << std::endl;
-      return 1;
-
-    } else if (command == "remove" && argc > i + 1) {
-      if (!fs::exists(std::string(argv[i + 1]) + ".gpg")) {
-        std::cerr << std::endl << "Fatal: " << argv[i + 1] << " does not exist!" << std::endl;
-        return 1;
-      }
-
-      try {
-        RemovePassword(argv[i + 1]);
-
-      } catch (const std::exception &e) {
-        std::cerr << std::endl << e.what() << std::endl;
-        return 1;
-      }
-      return 0;
-
-    } else if (command == "list") {
+    if (parser.isSet("list")) {
       List();
       return 0;
-
-    } else if (command == "add" && argc > i + 1) {
-      if (fs::exists(std::string(argv[i + 1]) + ".gpg")) {
-        std::cerr << std::endl << "Fatal: " << argv[i + 1] << " already exist!" << std::endl;
-        return 1;
-      }
-
-      try {
-        AddPassword(argv[i + 1], fingerprint);
-
-      } catch (const std::exception &e) {
-        std::cerr << std::endl << e.what() << std::endl;
-        return 1;
-      }
-      return 0;
-
-    } else if (command == "show" && argc > i + 1) {
-      if (!fs::exists(std::string(argv[i + 1]) + ".gpg")) {
-        std::cerr << std::endl << "Fatal: " << argv[i + 1] << " does not exist!" << std::endl;
-        return 1;
-      }
-
-      try {
-        ShowPassword(argv[i + 1]);
-
-      } catch (const std::exception &e) {
-        std::cerr << std::endl << e.what() << std::endl;
-        return 1;
-      }
-      return 0;
-
-    } else {
-      std::cerr << std::endl << "Invalid command: " << command << std::endl;
-      return 1;
     }
-  }
 
-  return 0;
+    if (parser.isSet("-k"))
+      fingerprint = parser.getValue("-k");
+
+    if (parser.isSet("init")) {
+      Git::Repository rep;
+      //  rep.Init("./");
+      std::cout << "Initializing git repository at " << rep.Path() + "/.git" << std::endl;
+      return 0;
+    }
+
+    if (parser.isSet("add")) {
+      name = parser.getValue("add");
+
+      if (fs::exists(name + ".gpg"))
+        throw std::runtime_error("Fatal! " + name + ".gpg exists!");
+
+      AddPassword(name, fingerprint);
+      return 0;
+    }
+
+    if (parser.isSet("remove")) {
+      name = parser.getValue("remove");
+
+      if (!fs::exists(name + ".gpg"))
+        throw std::runtime_error("Fatal! " + name + ".gpg doesn't exists!");
+
+      RemovePassword(name);
+      return 0;
+    }
+
+    if (parser.isSet("show")) {
+      name = parser.getValue("show");
+
+      if (!fs::exists(name + ".gpg"))
+        throw std::runtime_error("Fatal! " + name + ".gpg doesn't exists!");
+
+      ShowPassword(name);
+      return 0;
+    }
+
+  } catch (const std::exception &e) {
+    std::cerr << std::endl << e.what() << std::endl;
+    return 1;
+  }
 }

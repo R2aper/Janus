@@ -28,8 +28,18 @@ GpgME::Context *CreateGpgContext(GpgME::Protocol protocol) {
   return ctx;
 }
 
-std::vector<GpgME::Key> GetKeys(GpgME::Context *ctx, const std::string &key_id) {
-  return key_id.empty() ? GetAllKeys(ctx) : GetKeyById(ctx, key_id);
+std::vector<GpgME::Key> GetKeys(GpgME::Context *ctx, const std::vector<std::string> &key_id) {
+  std::vector<GpgME::Key> keys;
+
+  if (key_id.empty())
+    keys = GetAllKeys(ctx);
+
+  else {
+    for (auto it : key_id)
+      keys.push_back(GetKeyById(ctx, it));
+  }
+
+  return keys;
 }
 
 std::vector<GpgME::Key> GetAllKeys(GpgME::Context *ctx) {
@@ -48,15 +58,14 @@ std::vector<GpgME::Key> GetAllKeys(GpgME::Context *ctx) {
   return keys;
 }
 
-std::vector<GpgME::Key> GetKeyById(GpgME::Context *ctx, const std::string &key_id) {
-  std::vector<GpgME::Key> keys;
+GpgME::Key GetKeyById(GpgME::Context *ctx, const std::string &key_id) {
   GpgME::Error err;
   GpgME::Key key = ctx->key(key_id.c_str(), err);
 
-  if (!key.isNull() && key.canEncrypt())
-    keys.push_back(key);
+  if (key.isBad())
+    throw std::invalid_argument("No key was found for " + key_id + "!");
 
-  return keys;
+  return key;
 }
 
 } // namespace Janus

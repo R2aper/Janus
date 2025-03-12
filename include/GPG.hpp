@@ -26,11 +26,11 @@ GpgME::Context *CreateGpgContext(GpgME::Protocol protocol = GpgME::Protocol::Ope
   * If key_id is empty, it returns all available keys that can be used for encryption.
   * If key_id is specified, it retrieves the key associated with the given key_id
   * @param ctx The GpgME::Context object to use for retrieving keys
-  * @param key_id The identifier of key to retrieves(Default is empty)
+  * @param key_id The fingerprints of keys to retrieves
   * @return A vector of GpgME::Key objects
 
  */
-std::vector<GpgME::Key> GetKeys(GpgME::Context *ctx, const std::string &key_id = "");
+std::vector<GpgME::Key> GetKeys(GpgME::Context *ctx, const std::vector<std::string> &key_id = {});
 
 /*
  * Returns a list of all available keys that can be used for encryption
@@ -44,8 +44,8 @@ std::vector<GpgME::Key> GetAllKeys(GpgME::Context *ctx);
  *
  * @param ctx The GpgME::Context object to use for retrieving key
  * @param key_id The key identifier
- * @return A vector of GpgME::Key objects with only one element
+ * @return A GpgME::Key object that is can valid
  */
-std::vector<GpgME::Key> GetKeyById(GpgME::Context *ctx, const std::string &key_id);
+GpgME::Key GetKeyById(GpgME::Context *ctx, const std::string &key_id);
 
 } // namespace Janus

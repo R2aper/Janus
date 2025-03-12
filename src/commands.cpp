@@ -48,7 +48,7 @@ void RemovePassword(const std::string &name) {
     return;
 }
 
-void AddPassword(const std::string &name, const std::string &key_id) {
+void AddPassword(const std::string &name, const std::vector<std::string> &key_id) {
   auto ctx = CreateGpgContext();
   std::vector<GpgME::Key> keys = GetKeys(ctx, key_id);
 

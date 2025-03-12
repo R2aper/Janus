@@ -18,14 +18,12 @@ namespace fs = std::filesystem;
 // argparse
 /*
 TODO:
-! Parsing arguments, multiple passwords and etc
-* Error handling!!
+* Add new options
+* Class options?
 * Git2
 * Readme + license + wiki
 
 */
-
-// class parserarg
 
 // --quiet don't create commit
 // --create-branch <name_of_branch>
@@ -39,7 +37,7 @@ void usage() {
 Options: \n\
   -h, --help            Show this help message\n\
   -v, --version         Show version of janus and used libraries\n\
-  -k <fingerprint>      Enter fingerprint of the key to encrypt the password with(In default passwords encrypted with all available keys)\n\
+  -k <fingerprints>      Enter fingerprints of the keys to encrypt the password with(In default passwords encrypted with all available keys)\n\
 Commands: \n\
   init                  Initialize a new git repository in the current working directory(Similar to git init)\n\
   list                  List all passwords in the vault\n\
@@ -57,7 +55,7 @@ void version(const Git::Git2Library &lib) {
 
 void arguments(ArgParser &parser) {
   parser.AddArg("-h", "--help", ArgType::FLAG);
-  parser.AddArg("-k", "", ArgType::OPTION); // MULTIPLEOPTION
+  parser.AddArg("-k", "", ArgType::MULTIPLEOPTION);
   parser.AddArg("-v", "--version", ArgType::FLAG);
   //  parser.AddArg("-q", "--quiet", ArgType::FLAG);
   parser.AddArg("", "list", ArgType::FLAG);
@@ -77,8 +75,8 @@ int main(int argc, char *argv[]) {
 
   Git::Git2Library lib;
   InitGpgME();
-  // std::vector<std::string> fingerprints;
-  std::string name, fingerprint;
+  std::vector<std::string> fingerprints;
+  std::string name;
   ArgParser parser;
   arguments(parser);
 
@@ -104,7 +102,7 @@ int main(int argc, char *argv[]) {
     }
 
     if (parser.isSet("-k"))
-      fingerprint = parser.getValue("-k");
+      fingerprints = parser.getValues("-k");
 
     if (parser.isSet("init")) {
       Git::Repository rep;
@@ -119,7 +117,7 @@ int main(int argc, char *argv[]) {
       if (fs::exists(name + ".gpg"))
         throw std::runtime_error("Fatal! " + name + ".gpg exists!");
 
-      AddPassword(name, fingerprint);
+      AddPassword(name, fingerprints);
       return 0;
     }
 

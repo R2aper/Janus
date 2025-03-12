@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <vector>
 
 namespace Janus {
 
@@ -27,7 +28,7 @@ void RemovePassword(const std::string &name);
  * @throw std::runtime_error if encryption fails
  * @throw Git::Exception if creating commit fails
  */
-void AddPassword(const std::string &name, const std::string &key_id = "");
+void AddPassword(const std::string &name, const std::vector<std::string> &key_id);
 
 /*
  * Shows a password from the vault.

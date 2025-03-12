@@ -6,7 +6,7 @@
 
 namespace Janus {
 
-#define JANUS_VERSION "1.2"
+#define JANUS_VERSION "1.3"
 
 /* Get user input until the empty line and hide it by '*'
  *
